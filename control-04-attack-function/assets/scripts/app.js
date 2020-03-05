@@ -1,9 +1,10 @@
 /* eslint-disable no-undef */
 const ATTACK_VALUE = 10;
-const STRONG_ATTACK_VALUE = 17;
+const STRONG_ATTACK_VALUE = 15;
 const MONSTER_ATTACK_VALUE = 14;
 const HEAL_VALUE = 20;
-const chosenMaxLife = 100;
+const enteredValue = prompt('Maximum life for you and the monster.', '100');
+let chosenMaxLife = parseInt(enteredValue);
 const HEAL_BONUS_LIFE = (chosenMaxLife * 25) / chosenMaxLife;
 let currentMonsterHealth = chosenMaxLife;
 let currentPlayerHealth = chosenMaxLife;
@@ -12,6 +13,17 @@ let hasBonusLife = true;
 // eslint-disable-next-line no-undef
 adjustHealthBars(chosenMaxLife);
 
+// eslint-disable-next-line no-restricted-globals
+if (isNaN(chosenMaxLife) || chosenMaxLife <= 0) {
+  chosenMaxLife = 100;
+}
+
+function reset() {
+  currentMonsterHealth = chosenMaxLife;
+  currentPlayerHealth = chosenMaxLife;
+  resetGame(chosenMaxLife);
+}
+
 function showMessage(message) {
   alert(message);
 }
@@ -19,7 +31,8 @@ function showMessage(message) {
 function checkWinner() {
   if (currentPlayerHealth <= 0 && hasBonusLife) {
     hasBonusLife = false;
-    currentPlayerHealth = HEAL_BONUS_LIFE;
+    // eslint-disable-next-line no-use-before-define
+    healPlayer();
     removeBonusLife();
     showMessage('You would be dead but the bonus life saved you');
   }
@@ -30,6 +43,10 @@ function checkWinner() {
     showMessage('You lost');
   } else if (currentMonsterHealth <= 0 && currentPlayerHealth <= 0) {
     showMessage('draw');
+  }
+
+  if (currentMonsterHealth <= 0 || currentPlayerHealth <= 0) {
+    reset();
   }
 }
 
@@ -56,7 +73,9 @@ function healPlayer() {
   let healValue;
 
   if (currentPlayerHealth >= chosenMaxLife - HEAL_VALUE) {
-    showMessage('you can not heal more than your max health');
+    if (!hasBonusLife) {
+      showMessage('you can not heal more than your max health');
+    }
     healValue = chosenMaxLife - currentPlayerHealth;
   } else {
     healValue = HEAL_VALUE;
