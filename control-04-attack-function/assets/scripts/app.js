@@ -10,6 +10,9 @@ let currentMonsterHealth = chosenMaxLife;
 let currentPlayerHealth = chosenMaxLife;
 let hasBonusLife = true;
 
+const MODE_ATTACK = 'ATTACK';
+const MODE_STRONG_ATTACK = 'STRONG_ATTACK';
+
 // eslint-disable-next-line no-undef
 adjustHealthBars(chosenMaxLife);
 
@@ -57,25 +60,28 @@ function attackThePlayer() {
 
 function attackTheMonster(attackMode) {
   const monsterDamage =
-    attackMode === 'STRONG_ATTACK'
+    attackMode === MODE_STRONG_ATTACK
       ? dealMonsterDamage(STRONG_ATTACK_VALUE)
       : dealMonsterDamage(ATTACK_VALUE); // the damage dealt to the monster
   currentMonsterHealth -= monsterDamage;
 }
 
 function strongAttackHandler() {
-  attackTheMonster('STRONG_ATTACK');
+  attackTheMonster(MODE_STRONG_ATTACK);
   attackThePlayer();
   checkWinner();
 }
 
-function healPlayer() {
-  let healValue;
+function healPlayer(fromExtraLife) {
+  let healValue = fromExtraLife ? HEAL_BONUS_LIFE : null;
+
+  if (healValue) {
+    increasePlayerHealth(healValue);
+    currentPlayerHealth += healValue;
+    return;
+  }
 
   if (currentPlayerHealth >= chosenMaxLife - HEAL_VALUE) {
-    if (!hasBonusLife) {
-      showMessage('you can not heal more than your max health');
-    }
     healValue = chosenMaxLife - currentPlayerHealth;
   } else {
     healValue = HEAL_VALUE;
@@ -85,7 +91,7 @@ function healPlayer() {
 }
 
 function attackHandler() {
-  attackTheMonster('ATTACK');
+  attackTheMonster(MODE_ATTACK);
   attackThePlayer();
   checkWinner();
 }
